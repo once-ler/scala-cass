@@ -1,5 +1,3 @@
-import microsites._
-
 val cassandra3Version = "3.5.0"
 val cassandra2Version = "2.1.10.3"
 val cassandraVersion = sys.props.getOrElse("cassandra-driver.version", cassandra3Version) match {
@@ -8,18 +6,6 @@ val cassandraVersion = sys.props.getOrElse("cassandra-driver.version", cassandra
 }
 
 val baseVersion = "3.2.1"
-
-lazy val codeLinterSettings = {
-  Seq(
-    wartremoverWarnings in (Compile, compile) ++= Seq(
-      Wart.AsInstanceOf, Wart.DefaultArguments, Wart.EitherProjectionPartial, Wart.Enumeration,
-      Wart.Equals, Wart.ExplicitImplicitTypes, Wart.FinalCaseClass, Wart.FinalVal,
-      Wart.IsInstanceOf, Wart.JavaConversions, Wart.JavaSerializable, Wart.LeakingSealed,
-      Wart.Null, Wart.OptionPartial, Wart.Product, Wart.Recursion, Wart.Return,
-      Wart.Serializable, Wart.TryPartial, Wart.Var, Wart.While),
-    wartremoverWarnings in (Compile, console) := Seq.empty
-  )
-}
 
 def addUnmanagedSourceDirsFrom(folder: String) = {
   def addSourceFilesTo(conf: Configuration) =
@@ -33,10 +19,8 @@ def addUnmanagedSourceDirsFrom(folder: String) = {
 }
 
 lazy val commonSettings = Seq(
-  // upgrading to 2.13 is a real pain because stuff is getting deprecated, which is causing errors
-  // dealing with it later
-  scalaVersion := "2.12.10",
-  crossScalaVersions := Seq("2.12.10", "2.11.12", "2.10.7"),
+  scalaVersion := "2.13.8",
+  crossScalaVersions := Seq("2.13.8", "2.12.10", "2.11.12", "2.10.7"),
   scalacOptions ++= Seq(
     "-deprecation",
     "-encoding", "UTF-8",
@@ -49,15 +33,15 @@ lazy val commonSettings = Seq(
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard"
   ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, 13)) => Seq("-explaintypes", "-language:experimental.macros", "-Xlint:adapted-args,constant,doc-detached,nullary-unit,inaccessible,nullary-override,infer-any,missing-interpolator,doc-detached,private-shadow,type-parameter-shadow,poly-implicit-overload,option-implicit,delayedinit-select,package-object-classes,stars-align", "-Ywarn-unused:patvars,privates,locals", "-Ymacro-annotations", "-Ywarn-extra-implicit", "-Ycache-plugin-class-loader:last-modified", "-Ycache-macro-class-loader:last-modified")
-    case Some((2, 12)) => Seq("-Yno-adapted-args", "-Xlint:adapted-args,nullary-unit,inaccessible,nullary-override,infer-any,missing-interpolator,doc-detached,private-shadow,type-parameter-shadow,poly-implicit-overload,option-implicit,delayedinit-select,by-name-right-associative,package-object-classes,unsound-match,stars-align", "-Ywarn-unused:privates,locals", "-Xfuture")
-    case Some((2, 11)) => Seq("-Yno-adapted-args", "-Xlint:adapted-args,nullary-unit,inaccessible,nullary-override,infer-any,missing-interpolator,doc-detached,private-shadow,type-parameter-shadow,poly-implicit-overload,option-implicit,delayedinit-select,by-name-right-associative,package-object-classes,unsound-match,stars-align", "-Ywarn-unused", "-Ywarn-unused-import", "-Xfuture")
+    case Some((2, 13)) => Seq("-explaintypes", "-language:experimental.macros", "-Xlint:adapted-args,constant,doc-detached,nullary-unit,inaccessible,infer-any,missing-interpolator,doc-detached,private-shadow,type-parameter-shadow,poly-implicit-overload,option-implicit,delayedinit-select,package-object-classes,stars-align", "-Ywarn-unused:patvars,privates,locals", "-Ymacro-annotations", "-Ywarn-extra-implicit", "-Ycache-plugin-class-loader:last-modified", "-Ycache-macro-class-loader:last-modified")
+    case Some((2, 12)) => Seq("-Yno-adapted-args", "-Xlint:adapted-args,nullary-unit,inaccessible,infer-any,missing-interpolator,doc-detached,private-shadow,type-parameter-shadow,poly-implicit-overload,option-implicit,delayedinit-select,by-name-right-associative,package-object-classes,unsound-match,stars-align", "-Ywarn-unused:privates,locals", "-Xfuture")
+    case Some((2, 11)) => Seq("-Yno-adapted-args", "-Xlint:adapted-args,nullary-unit,inaccessible,infer-any,missing-interpolator,doc-detached,private-shadow,type-parameter-shadow,poly-implicit-overload,option-implicit,delayedinit-select,by-name-right-associative,package-object-classes,unsound-match,stars-align", "-Ywarn-unused", "-Ywarn-unused-import", "-Xfuture")
     case Some((2, 10)) => Seq("-Yno-adapted-args", "-Xlint", "-Xfuture")
     case _             => throw new IllegalArgumentException(s"scala version not configured: ${scalaVersion.value}")
   }),
   (scalacOptions in Test) -= "-Xfatal-warnings",
   parallelExecution in Test := false,
-) ++ codeLinterSettings
+)
 
 lazy val macroSettings = Seq(
   libraryDependencies ++= Seq(
@@ -108,88 +92,9 @@ lazy val noPublishSettings = Seq(
   publishArtifact := false
 )
 
-lazy val publishSettings = Seq(
-  homepage := Some(url("https://github.com/thurstonsand")),
-  licenses := Seq("MIT" -> url("http://www.opensource.org/licenses/mit-license.php")),
-  pomExtra :=
-    <scm>
-      <url>git@github.com/thurstonsand/scala-cass.git</url>
-      <connection>scm:git:git@github.com/thurstonsand/scala-cass.git</connection>
-    </scm>
-      <developers>
-        <developer>
-          <id>thurstonsand</id>
-          <name>Thurston Sandberg</name>
-          <url>https://github.com/thurstonsand</url>
-        </developer>
-      </developers>,
-  publishMavenStyle := true,
-  pomIncludeRepository := (_ => false),
-  bintrayReleaseOnPublish in ThisBuild := false,
-  bintrayPackageLabels := Seq("cassandra")
-)
-
-lazy val micrositeSettings = Seq(
-  micrositeName := "scala-cass",
-  micrositeAuthor := "Thurston Sandberg",
-  micrositeDescription := "Java Cassandra Driver Bindings for Friendlier Scala",
-  micrositeGithubOwner := "thurstonsand",
-  micrositeGithubRepo := "scala-cass",
-  micrositeBaseUrl := sys.props.getOrElse("microsite.baseurl", "scala-cass"),
-  micrositeImgDirectory := baseDirectory.value / "imgs",
-  micrositeCssDirectory := baseDirectory.value / "css",
-  micrositeDataDirectory := baseDirectory.value / "data",
-  micrositeExternalIncludesDirectory := baseDirectory.value / "includes",
-  micrositeGitterChannelUrl := "scala-cass/Lobby",
-  micrositeShareOnSocial := false,
-  micrositeHighlightTheme := "docco",
-  micrositeConfigYaml := ConfigYml(
-    yamlCustomProperties = Map(
-      "baseVersion" -> baseVersion,
-      "cassandra2Version" -> cassandra2Version,
-      "cassandra3Version" -> cassandra3Version
-    )
-  ),
-  includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md",
-  ghpagesNoJekyll := false,
-  fork in tut := true,
-  git.remoteRepo := "git@github.com:thurstonsand/scala-cass.git"
-)
-
-// in case I need macros in the future
-//lazy val `scala-cass-macros` = project.in(file("macro"))
-//  .settings(moduleName := "scala-cass-macros")
-//  .settings(commonSettings: _*)
-//  .settings(macroSettings: _*)
-
 lazy val `scala-cass` = project.in(file("."))
   .settings(moduleName := "scala-cass",
             sourceGenerators in Compile += (sourceManaged in Compile).map(Boilerplate.gen).taskValue)
   .settings(commonSettings: _*)
   .settings(applicationSettings: _*)
-  .settings(publishSettings: _*)
   .settings(addUnmanagedSourceDirsFrom(if (cassandraVersion startsWith "2.1.") "scala_cass21" else "scala_cass3"))
-//  .dependsOn(`scala-cass-macros`)
-
-lazy val `tut-cass3` = project.in(file("docs/cass3"))
-  .enablePlugins(MicrositesPlugin)
-  .settings(commonSettings: _*)
-  .settings(applicationSettings: _*)
-  .settings(micrositeSettings: _*)
-  .settings(noPublishSettings: _*)
-  .settings(addUnmanagedSourceDirsFrom("scala_cass3"): _*)
-  .dependsOn(`scala-cass`)
-
-lazy val `tut-cass21`=  project.in(file("docs/cass21"))
-  .enablePlugins(MicrositesPlugin)
-  .settings(commonSettings: _*)
-  .settings(applicationSettings: _*)
-  .settings(micrositeSettings: _*)
-  .settings(noPublishSettings: _*)
-  .settings(addUnmanagedSourceDirsFrom("scala_cass21"): _*)
-  .dependsOn(`scala-cass`)
-
-lazy val docs = project.in(file("docs/root"))
-  .enablePlugins(MicrositesPlugin)
-  .settings(micrositeSettings: _*)
-  .settings(noPublishSettings: _*)

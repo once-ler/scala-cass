@@ -1,4 +1,4 @@
-target
+**/target
 .idea
 .ensime
 .ensime_cache
@@ -11,3 +11,5 @@ lib
 docs/root/src/main/tut/cass3/*
 docs/root/src/main/tut/cass21/*
 .java-version
+.metals
+.vscode
