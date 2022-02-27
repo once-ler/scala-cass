@@ -72,7 +72,7 @@ private[scalacass] object QueryBuildingBlock {
   }
 
   object TTLTimestamp {
-    final case object Neither extends TTLTimestamp with NoQuery
+    case object Neither extends TTLTimestamp with NoQuery
 
     final case class TTL(ttl: Int) extends TTLTimestamp {
       def strRepr: Result[String] = Right(" USING TTL ?")
@@ -224,14 +224,14 @@ private[scalacass] object QueryBuildingBlock {
   sealed trait If extends QueryBuildingBlock
 
   object If {
-    final case object NoConditional extends If with NoQuery
+    case object NoConditional extends If with NoQuery
 
-    final case object IfNotExists extends If {
+    case object IfNotExists extends If {
       val strRepr   = Right(" IF NOT EXISTS")
       val valueRepr = Right(Nil)
     }
 
-    final case object IfExists extends If {
+    case object IfExists extends If {
       val strRepr   = Right(" IF EXISTS")
       val valueRepr = Right(Nil)
     }
@@ -244,7 +244,7 @@ private[scalacass] object QueryBuildingBlock {
   sealed trait Limit extends QueryBuildingBlock
 
   object Limit {
-    final case object NoLimit extends NoQuery with Limit
+    case object NoLimit extends NoQuery with Limit
     final case class LimitN(limit: Int) extends Limit {
       def strRepr: Result[String] = Right(" LIMIT ?")
       def valueRepr: Result[List[AnyRef]] =
@@ -255,8 +255,8 @@ private[scalacass] object QueryBuildingBlock {
   sealed trait Filtering extends QueryBuildingBlock
 
   object Filtering {
-    final case object NoFiltering extends NoQuery with Filtering
-    final case object AllowFiltering extends Filtering {
+    case object NoFiltering extends NoQuery with Filtering
+    case object AllowFiltering extends Filtering {
       val strRepr: Result[String]         = Right(" ALLOW FILTERING")
       val valueRepr: Result[List[AnyRef]] = Right(Nil)
     }
@@ -312,7 +312,7 @@ private[scalacass] object QueryBuildingBlock {
 
   sealed trait TableProperties extends QueryBuildingBlock
   object TableProperties {
-    final case object NoProperties extends NoQuery with TableProperties
+    case object NoProperties extends NoQuery with TableProperties
     final case class With(properties: String) extends TableProperties {
       def strRepr   = Right(s" WITH $properties")
       def valueRepr = Right(Nil)

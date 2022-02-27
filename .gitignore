@@ -13,3 +13,6 @@ docs/root/src/main/tut/cass21/*
 .java-version
 .metals
 .vscode
+**/.bloop
+.bloop
+.bsp

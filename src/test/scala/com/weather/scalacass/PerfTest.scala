@@ -6,6 +6,7 @@ import syntax._
 
 object LongRunning extends Tag("LongRunning")
 
+/*
 class PerfTest extends CassandraUnitTester {
   val db = "perfdb"
   val table = "perftable"
@@ -50,3 +51,4 @@ class PerfTest extends CassandraUnitTester {
     fgetAs()
   }
 }
+*/
